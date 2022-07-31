@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "mynux"
+version = "0.1.0"
+description = ""
+authors = ["axju <moin@axju.de>"]
+
+[tool.poetry.scripts]
+mynux = 'mynux.__main__:main'
+
+[tool.poetry.plugins.'mynux.cmd']
+'run' = 'mynux.run:cli'
+'cp' = 'mynux.utils.cp:cli'
+'init' = 'mynux.utils.init:cli'
+'ln' = 'mynux.utils.ln:cli'
+'ls' = 'mynux.utils.ls:cli'
+'pkg' = 'mynux.utils.pkg:cli'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
