@@ -4,8 +4,15 @@ from configparser import ConfigParser
 
 DEFAULT_CONFIG = {
     'root': {
-        'dotfiles': ['/etc/mynux/dotfiles'],
-    }
+        'RepoDir': '/etc/mynux/repos',
+        'DotFiles': '/etc/mynux/dotfiles',
+    },
+    'system': {
+        'Path': '/etc/mynux/dotfiles',
+    },
+    'local': {
+        'Path': '~./config/mynux/dotfiles',
+    },
 }
 
 DEFAULT_CONFIG_PATH: Path = '/etc/mynux/config.ini'
