@@ -15,7 +15,7 @@ DEFAULT_CONFIG = {
     },
 }
 
-DEFAULT_CONFIG_PATH: Path = '/etc/mynux/config.ini'
+DEFAULT_CONFIG_PATH: Path = Path('/etc/mynux/config.ini')
 
 
 def get_default_config() -> ConfigParser:
@@ -25,13 +25,13 @@ def get_default_config() -> ConfigParser:
     return config
 
 
-def load_config(path: Path=DEFAULT_CONFIG_PATH) -> dict:
+def load_config(path: Path = DEFAULT_CONFIG_PATH) -> dict:
     config = get_default_config()
     config.read(path)
     return {key: dict(config.items(key)) for key in config.sections()}
 
 
-def create_default_config(path: Path=DEFAULT_CONFIG_PATH):
+def create_default_config(path: Path = DEFAULT_CONFIG_PATH):
     config = get_default_config()
     with path.open('w') as file:
         config.write(file)
