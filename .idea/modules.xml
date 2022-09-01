@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$USER_HOME$/.config/mynux/repos/dotfiles/.idea/dotfiles.iml" filepath="$USER_HOME$/.config/mynux/repos/dotfiles/.idea/dotfiles.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mynux.iml" filepath="$PROJECT_DIR$/.idea/mynux.iml" />
     </modules>
   </component>

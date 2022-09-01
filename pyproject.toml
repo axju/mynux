@@ -1,3 +1,7 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "mynux"
 version = "0.1.0"
@@ -8,19 +12,113 @@ authors = ["axju <moin@axju.de>"]
 mynux = 'mynux.__main__:main'
 
 [tool.poetry.plugins.'mynux.cmd']
-'run' = 'mynux.run:cli'
-'cp' = 'mynux.utils.cp:cli'
-'init' = 'mynux.utils.init:cli'
-'ln' = 'mynux.utils.ln:cli'
-'ls' = 'mynux.utils.ls:cli'
-'pkg' = 'mynux.utils.pkg:cli'
+'info' = 'mynux.cli.info:main'
+'install' = 'mynux.cli.install:main'
 
 [tool.poetry.dependencies]
 python = "^3.10"
+tomli = { version = "^2.0.1", python = "<3.11" }
 
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.20.0"
+pytest = "^7.1.2"
+pytest-html = "^3.1.1"
+pytest-cov = "^3.0.0"
+coverage = "^6.1.2"
+coverage-badge = "^1.1.0"
+mypy = "^0.971"
+pylint = "^2.15.0"
+pyupgrade = "^2.37.3"
+isort = "^5.10.1"
+black = "^22.8.0"
+safety = "^2.1.1"
+bandit = "^1.7.4"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.pytest.ini_options]
+# https://docs.pytest.org/en/6.2.x/customize.html#pyproject-toml
+# Directories that are not visited by pytest collector:
+norecursedirs =["hooks", "*.egg", ".eggs", "dist", "build", "docs", ".tox", ".git", "__pycache__"]
+doctest_optionflags = ["NUMBER", "NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL"]
+
+# Extra options:
+addopts = [
+  "--strict-markers",
+  "--tb=short",
+  "--doctest-modules",
+  "--doctest-continue-on-failure",
+]
+
+[tool.coverage.run]
+source = ["tests"]
+
+[coverage.paths]
+source = "mynux"
+
+[coverage.run]
+branch = true
+
+[coverage.report]
+fail_under = 50
+show_missing = true
+
+
+[tool.mypy]
+ignore_missing_imports = true
+allow_redefinition = true
+check_untyped_defs = true
+
+[tool.pylint.messages_control]
+max-line-length = 160
+disable = ["missing-docstring", "broad-except", "fixme", "subprocess-run-check"]
+ignore = ["tests"]
+
+[tool.bandit]
+skips = [
+  #"B404",
+  #"B603",
+  #"B607",
+]
+
+[tool.black]
+target-version = ["py310"]
+line-length = 160
+color = true
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | env
+    | venv
+)/
+'''
+
+[tool.isort]
+py_version = 310
+line_length = 160
+known_typing = ["typing", "types", "typing_extensions", "mypy", "mypy_extensions"]
+sections = ["FUTURE", "TYPING", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+include_trailing_comma = true
+profile = "black"
+multi_line_output = 3
+indent = 4
+color_output = true
+
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+skipsdist = true
+envlist = py37, py38, py39, py310
+[testenv]
+whitelist_externals = poetry
+commands =
+    poetry install -v
+    poetry run pytest
+"""
