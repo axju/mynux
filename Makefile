@@ -49,3 +49,7 @@ check-safety:
 
 .PHONY: test-all
 test-all: test mypy pylint check-safety
+
+.PHONY: tox
+tox:
+	poetry run tox

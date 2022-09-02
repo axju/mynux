@@ -6,7 +6,13 @@ Just a dotfile manager with some extras.
 
 Install
 -------
-???
+It's a python package, so simple install with pip::
+
+    pip install mynux
+
+or get the latest version from git::
+
+    pip install git+https://github.com/axju/mynux.git
 
 Quickstart
 ----------
@@ -20,7 +26,7 @@ be linked or copy to your home directory. With the mynux.toml file you can also
 install package.
 
 Multi storage setup
--------------------
+~~~~~~~~~~~~~~~~~~~
 Add a repo or directory to the local config directory::
 
     mynux add git@github.com/axju/dotfiles.git
@@ -35,8 +41,24 @@ will install all mynux storage from the mynux config directory. To change the or
 you can uses the argument "--sort=name1,name2..." or change the config file
 "~./config/mynux/config.toml".
 
-poetry
-------
-This is the first project I uses poetry. Some nodes::
+Dev
+---
+This project is mange with `Poetry <https://python-poetry.org/>`_. First install
+Poetry, then run::
 
-    poetry run mynux
+    poetry install
+
+to install the project. Setup the per-commit hook with::
+
+    poetry run pre-commit install
+
+Now you are ready to develop. We have also a "Makefile". Look at the file to see
+the bare commands. This ar some of them::
+
+    make install
+    make formatting
+    make test-all
+
+Bugs
+----
+If you find any bugs, pleas open an `Issue <https://github.com/axju/mynux/issues/new>`_.

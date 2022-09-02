@@ -1,8 +1,10 @@
 import sys
 from logging import getLogger
 
-from mynux.storage import load
-from mynux.utils import get_mynux_arg_parser
+from mynux.system import SysStorage
+from mynux.utils.__init__ import get_mynux_arg_parser
+
+from ..storage import load
 
 logger = getLogger(__name__)
 
@@ -10,15 +12,12 @@ logger = getLogger(__name__)
 def main(*argv: str) -> int:
     logger.info("run info with: %s", argv)
     parser = get_mynux_arg_parser(prog="info")
-    parser.add_argument("source", type=str, help="source dir")
+    parser.add_argument("source", nargs="?", type=str, help="source dir")
 
-    args = parser.parse_args(argv or sys.argv)
-    storage = load(args.source)
-    if storage is None:
-        logger.error('Fail to load storage "%s".', args.source)
-        return 1
+    args = parser.parse_args(argv)
+    storage = load(args.source) or SysStorage()
     return int(storage.action("info"))
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(*sys.argv))

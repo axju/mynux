@@ -3,12 +3,13 @@ from typing import Optional
 from logging import getLogger
 from pathlib import Path
 
-from ..utils import FileOperation, check_filter, file_operation_main, iter_gitignore_filter
+from mynux.utils import FileOperation, check_filter, file_operation_main, iter_gitignore_filter
+from mynux.utils.action import ActionCls
 
 logger = getLogger(__name__)
 
 
-class Storage:
+class Storage(ActionCls):
     """
     A simple dotfile directory, no extra mynux.toml file :(
     But good enough to list, copy or link the files.
@@ -19,6 +20,7 @@ class Storage:
     DEFAULT_ACTIONS = {"info": False, "file": ["target_dir", "file_operation"]}
 
     def __init__(self, path: Path):
+        super().__init__()
         self.path = path.resolve()
         if self.path.is_file() and self.path.parent.is_dir():
             self.path = self.path.parent
@@ -26,37 +28,6 @@ class Storage:
 
     def __bool__(self):
         return self.path.is_dir()
-
-    def __call__(self, name: str | None = None, **kwargs) -> bool:
-        try:
-            return self.action(name, **kwargs)
-        except Exception as exc:
-            logger.exception('Fail to call "%s".', self, exc_info=exc)
-        return False
-
-    def check_action(self, name: str) -> bool:
-        return hasattr(self, f"action_{name}")
-
-    def action(self, name: str | None = None, **kwargs) -> bool:
-        """execute a single action or all DEFAULT_ACTIONS"""
-        if name is None:
-            for action, args in self.DEFAULT_ACTIONS.items():
-                action_kwargs = {}
-                match args:
-                    case list():
-                        action_kwargs = {arg: kwargs.get(arg) for arg in args if arg in kwargs}
-                    case False:
-                        continue
-                # exit if any action fail
-                if not self.action(action, **action_kwargs):
-                    return False
-            return True
-
-        func = getattr(self, f"action_{name}", None)
-        if func:
-            return func(**kwargs)
-        logger.warning('The action "%s" is not available in the class "%s"!', name, self.__class__)
-        return False
 
     def action_file(self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.LINK) -> bool:
         """

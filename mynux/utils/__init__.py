@@ -1,12 +1,20 @@
+from typing import Dict
+
 import fnmatch
 import re
 import shutil
 import subprocess  # nosec
+import sys
 from argparse import ArgumentParser
 from enum import Enum
 from importlib.metadata import entry_points
 from logging import getLogger
 from pathlib import Path
+
+if sys.version_info >= (3, 11):
+    import tomllib  # pylint: disable=import-error
+else:
+    import tomli as tomllib
 
 logger = getLogger(__name__)
 
@@ -97,7 +105,7 @@ def check_target_file(target_file: Path, user_action: UserAction = UserAction.AS
             raise Exception("WTF, how is this happening? Do you append the UserAction?")
 
     # just to make sure that the file is deleted
-    return target_file.is_file() or target_file.is_symlink()
+    return not target_file.is_file() and not target_file.is_symlink()
 
 
 def file_operation_link(source_file: Path, target_file: Path, user_action: UserAction = UserAction.ASK) -> bool:
@@ -140,7 +148,9 @@ def file_operation_main(source_file: Path, target_file: Path, file_operation: Fi
         case _:
             result = False
     if result:
-        logger.info('install file "%s" to "%s"', source_file, target_file)
+        logger.info('Install file "%s" to "%s".', source_file, target_file)
+    else:
+        logger.warning('Fail to install file "%s" to "%s".', source_file, target_file)
     return result
 
 
@@ -152,7 +162,15 @@ def check_pkg(pkg: str) -> bool:
 
     proc = subprocess.run(["pacman", "-Qg", pkg], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)  # nosec
     group_pkg = [line.decode().split()[1] for line in proc.stdout.splitlines()]
-    if proc.returncode == 0 and all(map(check_pkg, group_pkg)):
-        return True
+    return proc.returncode == 0 and all(map(check_pkg, group_pkg))
 
-    return False
+
+def load_toml(path: Path) -> Dict:
+    if not path.is_file():
+        return {}
+    try:
+        with path.open("rb") as file:
+            return tomllib.load(file)
+    except Exception as exc:
+        logger.exception('Fail to load "%s".', path, exc_info=exc)
+    return {}

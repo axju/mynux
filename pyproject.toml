@@ -4,8 +4,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "mynux"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
+readme = "README.rst"
 authors = ["axju <moin@axju.de>"]
 
 [tool.poetry.scripts]
@@ -18,6 +19,7 @@ mynux = 'mynux.__main__:main'
 [tool.poetry.dependencies]
 python = "^3.10"
 tomli = { version = "^2.0.1", python = "<3.11" }
+tox = "^3.25.1"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
@@ -115,10 +117,24 @@ color_output = true
 legacy_tox_ini = """
 [tox]
 skipsdist = true
-envlist = py37, py38, py39, py310
+envlist = py310, py311
+skip_missing_interpreters = true
+isolated_build = True
 [testenv]
-whitelist_externals = poetry
+deps =
+    poetry
+#    pytest
+whitelist_externals =
+  bash
+skip_install = true
+commands_pre =
+    bash -c 'poetry export --with dev --without-hashes -f requirements.txt > .requirements.txt'
+    python -m pip install --no-deps -r .requirements.txt
+    python -m pip install .
 commands =
-    poetry install -v
-    poetry run pytest
+    pylint --rcfile pyproject.toml mynux
+    mypy --config-file pyproject.toml -p mynux
+    bandit -r -c pyproject.toml mynux
+    safety check --full-report
+    pytest -c pyproject.toml --cov-report=html tests
 """

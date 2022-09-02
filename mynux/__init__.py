@@ -2,7 +2,7 @@ from typing import Dict
 
 import sys
 
-from mynux.utils import iter_cmds
+from mynux.utils.__init__ import iter_cmds
 
 if sys.version_info >= (3, 8):
     from importlib import metadata as importlib_metadata
