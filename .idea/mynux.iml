@@ -9,6 +9,7 @@
     <orderEntry type="jdk" jdkName="Poetry (mynux)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dotfiles" />
+    <orderEntry type="module" module-name="private-dotfiles" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />

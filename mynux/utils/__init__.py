@@ -108,6 +108,14 @@ def check_target_file(target_file: Path, user_action: UserAction = UserAction.AS
     return not target_file.is_file() and not target_file.is_symlink()
 
 
+def set_file_permission(target_file: Path, file_permission: int | None = None) -> bool:
+    if file_permission is not None:
+        file_permission_cmd = str(file_permission) if file_permission in range(0, 777) else "600"
+        proc = subprocess.run(["chmod", file_permission_cmd, target_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)  # nosec
+        return proc.returncode == 0
+    return True
+
+
 def file_operation_link(source_file: Path, target_file: Path, user_action: UserAction = UserAction.ASK) -> bool:
     if not check_target_file(target_file, user_action):
         return False
@@ -120,31 +128,33 @@ def file_operation_link(source_file: Path, target_file: Path, user_action: UserA
         return False
 
 
-def file_operation_copy(source_file: Path, target_file: Path, user_action: UserAction = UserAction.ASK) -> bool:
+def file_operation_copy(source_file: Path, target_file: Path, user_action: UserAction = UserAction.ASK, file_permission: int | None = None) -> bool:
     if not check_target_file(target_file, user_action):
         return False
     try:
         target_file.unlink(missing_ok=True)
         target_file.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(source_file, target_file)
-        return True
+        return set_file_permission(target_file, file_permission)
     except Exception as exc:
         logger.error("Error at file_operation_copy", exc_info=exc)
         return False
 
 
-def file_operation_append(source_file: Path, target_file: Path) -> bool:
-    raise NotImplementedError
+def file_operation_append(source_file: Path, target_file: Path, file_permission: int | None = None) -> bool:
+    with source_file.open("r") as s_file, target_file.open("a+") as t_file:
+        t_file.write(s_file.read())
+    return set_file_permission(target_file, file_permission)
 
 
-def file_operation_main(source_file: Path, target_file: Path, file_operation: FileOperation) -> bool:
+def file_operation_main(source_file: Path, target_file: Path, file_operation: FileOperation, file_permission: int | None = None) -> bool:
     match file_operation:
         case FileOperation.LINK:
             result = file_operation_link(source_file, target_file)
         case FileOperation.COPY:
-            result = file_operation_copy(source_file, target_file)
+            result = file_operation_copy(source_file, target_file, file_permission=file_permission)
         case FileOperation.APPEND:
-            result = file_operation_append(source_file, target_file)
+            result = file_operation_append(source_file, target_file, file_permission=file_permission)
         case _:
             result = False
     if result:

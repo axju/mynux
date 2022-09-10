@@ -34,13 +34,24 @@ class MynuxStorage(Storage):
     def __bool__(self):
         return self.mynux_path.is_file()
 
-    def action_file(self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.LINK) -> bool:
+    def action_file(
+        self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.LINK, default_file_permission: int | None = None
+    ) -> bool:
+
+        if file_operation := self.mynux.get("defaults", {}).get("file_operation"):
+            default_file_operation = FileOperation.get_from_str(file_operation, default_file_operation)
+
+        if file_permissions := self.mynux.get("defaults", {}).get("file_permission"):
+            default_file_permission = file_permissions
+
         for source_file, target_file in self.iter_files(target_dir):
             relative_source_file = source_file.relative_to(self.path)
-            file_operation_str = self.mynux.get("files", {}).get(str(relative_source_file), "none")
+            file_operation_str = self.mynux.get("file_operations", {}).get(str(relative_source_file), "none")
             file_operation = FileOperation.get_from_str(file_operation_str, default_file_operation)
-            if not file_operation_main(source_file, target_file, file_operation):
-                return False
+
+            file_permissions = self.mynux.get("file_permissions", {}).get(str(relative_source_file), default_file_permission)
+
+            file_operation_main(source_file, target_file, file_operation, file_permissions)
         return True
 
     def action_pkgs(self) -> bool:
@@ -72,14 +83,14 @@ class MynuxStorage(Storage):
         return True
 
     def iter_post_install_cmds(self, pkg: str):
-        cmds = self.mynux.get("post_install_cmd", {}).get(pkg, [])
+        cmds = self.mynux.get("os", {}).get("post_install_cmd", {}).get(pkg, [])
         if isinstance(cmds, list):
             yield from cmds
         if isinstance(cmds, str):
             yield cmds
 
     def iter_pkgs(self, pkg_action: IterPkgAction = IterPkgAction.ALL) -> Iterable:
-        pkgs: List[str] = list(self.mynux.get("package", []))
+        pkgs: List[str] = list(self.mynux.get("os", {}).get("package", []))
         match pkg_action:
             case IterPkgAction.ALL:
                 return iter(pkgs)

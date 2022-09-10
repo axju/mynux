@@ -15,7 +15,7 @@ class Storage(ActionCls):
     But good enough to list, copy or link the files.
     """
 
-    DEFAULT_FILTER = [".git/*", "mynux.toml", "*README*"]
+    DEFAULT_FILTER = [".git/*", "mynux.toml", "*README*", ".idea/*"]
 
     DEFAULT_ACTIONS = {"info": False, "file": ["target_dir", "file_operation"]}
 

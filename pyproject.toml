@@ -14,6 +14,7 @@ mynux = 'mynux.__main__:main'
 
 [tool.poetry.plugins.'mynux.cmd']
 'info' = 'mynux.cli.info:main'
+'add' = 'mynux.cli.add:main'
 'install' = 'mynux.cli.install:main'
 
 [tool.poetry.dependencies]
