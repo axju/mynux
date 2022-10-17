@@ -26,10 +26,16 @@ class Storage(ActionCls):
             self.path = self.path.parent
         self.filters = list(self.iter_filter())
 
+    def __str__(self):
+        return str(self.path)
+
     def __bool__(self):
         return self.path.is_dir()
 
-    def action_file(self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.LINK) -> bool:
+    def __eq__(self, other):
+        return self.path == other.path
+
+    def action_file(self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.COPY) -> bool:
         """
         copy, link or append files and even more in the mynux class
         """
@@ -38,9 +44,15 @@ class Storage(ActionCls):
         return True
 
     def action_info(self) -> bool:
-        for file in self.iter_files():
-            print(file)
+        files = len(list(self.iter_files()))
+        print(f"Name:     {self.get_name()}")
+        print(f"Class:    {self.__class__.__name__}")
+        print(f"Path:     {self.path}")
+        print(f"Files:    {files}")
         return True
+
+    def get_name(self):
+        return self.path.name
 
     def iter_files(self, target_dir: Optional[Path] = None):
         """

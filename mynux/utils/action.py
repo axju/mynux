@@ -12,7 +12,8 @@ class ActionCls:
 
     DEFAULT_ACTIONS: Dict[str, List | bool] = {}
 
-    def __call__(self, name: str | None = None, **kwargs) -> bool:
+    def __call__(self, name: str | None = None, **kwargs):
+        logger.debug("call storage=%s with name=%s kwargs=%s", self, name, kwargs)
         try:
             return self.action(name, **kwargs)
         except Exception as exc:
@@ -22,7 +23,7 @@ class ActionCls:
     def check_action(self, name: str) -> bool:
         return hasattr(self, f"action_{name}")
 
-    def action(self, name: str | None = None, **kwargs) -> bool:
+    def action(self, name: str | None = None, **kwargs):
         """execute a single action or all DEFAULT_ACTIONS"""
         if name is None:
             for action, args in self.DEFAULT_ACTIONS.items():

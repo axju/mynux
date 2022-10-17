@@ -15,7 +15,7 @@ def main(*argv: str) -> int:
     parser.add_argument("source", nargs="?", type=str, help="source dir")
 
     args = parser.parse_args(argv)
-    storage = load(args.source) or SysStorage()
+    storage = load(args.source) or SysStorage.create()
     return int(storage.action("info"))
 
 

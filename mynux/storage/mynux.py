@@ -35,7 +35,7 @@ class MynuxStorage(Storage):
         return self.mynux_path.is_file()
 
     def action_file(
-        self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.LINK, default_file_permission: int | None = None
+        self, target_dir=Path.home(), default_file_operation: FileOperation = FileOperation.COPY, default_file_permission: int | None = None
     ) -> bool:
 
         if file_operation := self.mynux.get("defaults", {}).get("file_operation"):
@@ -76,11 +76,13 @@ class MynuxStorage(Storage):
         return True
 
     def action_info(self) -> bool:
-        total = len(list(self.iter_pkgs()))
-        new = len(list(self.iter_pkgs(IterPkgAction.NEW)))
-        installed = total - new
-        print(f"Packages: {total} | new: {new} | installed: {installed}")
+        super().action_info()
+        pkgs = len(list(self.iter_pkgs()))
+        print(f"Packages: {pkgs}")
         return True
+
+    def get_name(self):
+        return self.mynux.get("meta", {}).get("name", self.path.name)
 
     def iter_post_install_cmds(self, pkg: str):
         cmds = self.mynux.get("os", {}).get("post_install_cmd", {}).get(pkg, [])

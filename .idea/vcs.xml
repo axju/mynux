@@ -3,5 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$USER_HOME$/.config/mynux/repos/git/dotfiles" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../axju-os" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../pkg/axju-mynux" vcs="Git" />
   </component>
 </project>
